@@ -1,9 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#3498db">
     <title>StudyPulse - Organizador Universitario</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+<body>
+    <!-- Pantalla de bienvenida -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-brain"></i>
+            </div>
+            <div class="logo-text">StudyPulse</div>
+            <div class="university-input-container">
+                <input type="text" id="universityName" placeholder="Ingresa el nombre de tu universidad" class="university-input">
+            </div>
+        </div>
+        <div class="welcome-message" id="welcomeMessage">
+            ¡Bienvenido a StudyPulse! Tu organizador universitario personalizado.
+        </div>
+        <button class="btn" id="enterBtn">Comenzar</button>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="container" id="mainContent">
+        <header>
+            <div class="header-logo">
+                <i class="fas fa-brain"></i>
+                <h1>StudyPulse</h1>
+            </div>
+            <div class="user-info">
+                <div class="user-avatar">U</div>
+                <span id="displayUniversity">Universidad</span>
+            </div>
+        </header>
+
+        <!-- Sección de gestión de asignaturas -->
+        <section class="subjects-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-book"></i> Mis Asignaturas</h2>
+                <button class="btn btn-small" id="addSubjectBtn">Añadir Asignatura</button>
+            </div>
+            <div class="subjects-grid" id="subjectsGrid">
+                <!-- Las asignaturas se cargarán dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Sección de funciones -->
+        <section class="functions-section">
+            <h2 class="section-title"><i class="fas fa-tasks"></i> ¿Qué función quieres realizar hoy?</h2>
+            <div class="functions-grid">
+                <div class="function-card" id="emailCard">
+                    <div class="function-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3>Organizar Correo</h3>
+                    <p>Gestiona tus correos de Gmail y Microsoft</p>
+                </div>
+                <div class="function-card" id="tasksCard">
+                    <div class="function-icon">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <h3>Organizar Tareas</h3>
+                    <p>Accede a tu aplicación de notas</p>
+                </div>
+                <div class="function-card" id="docsCard">
+                    <div class="function-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3>Organizar Documentos</h3>
+                    <p>Accede a Google Docs</p>
+                </div>
+                <div class="function-card" id="calendarCard">
+                    <div class="function-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Calendario</h3>
+                    <p>Gestiona tus planes y eventos</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de calendario -->
+        <section class="calendar-section">
+            <div class="calendar-header">
+                <div class="calendar-nav">
+                    <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <h2 id="currentMonth">Septiembre 2023</h2>
+                    <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <button class="btn" id="addEventBtn">Añadir Evento</button>
+            </div>
+            <div class="calendar" id="calendar">
+                <!-- El calendario se generará dinámicamente -->
+            </div>
+        </section>
+
+        <!-- Sección de enlaces rápidos -->
+        <section class="quick-links-section">
+            <h2 class="section-title"><i class="fas fa-link"></i> Enlaces Rápidos</h2>
+            <div class="quick-links-grid">
+                <a href="https://chat.openai.com" target="_blank" class="quick-link">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <span>ChatGPT</span>
+                </a>
+                <a href="https://www.deepseek.com" target="_blank" class="quick-link">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <span>DeepSeek</span>
+                </a>
+                <a href="https://www.google.com" target="_blank" class="quick-link">
+                    <div class="quick-link-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <span>Google</span>
+                </a>
+                <a href="https://www.youtube.com" target="_blank" class="quick-link">
+                    <div class="quick-link-icon">
+                        <i class="fab fa-youtube"></i>
+                    </div>
+                    <span>YouTube</span>
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal para añadir asignaturas -->
+    <div class="modal" id="subjectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Añadir Nueva Asignatura</h3>
+                <button class="close-btn" id="closeSubjectModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="subjectForm">
+                    <div class="form-group">
+                        <label for="subjectName">Nombre de la asignatura</label>
+                        <input type="text" id="subjectName" required maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="subjectLevel">Nivel de dificultad</label>
+                        <select id="subjectLevel" required>
+                            <option value="bajo">Bajo</option>
+                            <option value="medio">Medio</option>
+                            <option value="alto">Alto</option>
+                            <option value="muy-alto">Muy Alto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="subjectGrade">Nota actual (opcional)</label>
+                        <input type="number" id="subjectGrade" min="0" max="10" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label for="subjectColor">Color de la asignatura</label>
+                        <input type="color" id="subjectColor" value="#3498db">
+                    </div>
+                    <button type="submit" class="btn">Guardar Asignatura</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles de asignatura -->
+    <div class="modal" id="subjectDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detailSubjectName">Detalles de la Asignatura</h3>
+                <button class="close-btn" id="closeDetailModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="subject-info">
+                    <div class="info-item">
+                        <span class="info-label">Nivel:</span>
+                        <span id="detailSubjectLevel" class="info-value"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Nota:</span>
+                        <span id="detailSubjectGrade" class="info-value"></span>
+                    </div>
+                </div>
+                <div class="file-upload-section">
+                    <h4>Archivos de la asignatura</h4>
+                    <div class="file-list" id="fileList">
+                        <!-- Los archivos se cargarán dinámicamente -->
+                    </div>
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Arrastra archivos aquí o haz clic para subir</p>
+                        <input type="file" id="fileInput" multiple style="display: none;">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-danger" id="deleteSubjectBtn">Eliminar Asignatura</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para añadir eventos -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Añadir Nuevo Evento</h3>
+                <button class="close-btn" id="closeEventModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="eventForm">
+                    <div class="form-group">
+                        <label for="eventTitle">Título del evento</label>
+                        <input type="text" id="eventTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDate">Fecha</label>
+                        <input type="date" id="eventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventDescription">Descripción</label>
+                        <textarea id="eventDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventSubject">Asignatura relacionada (opcional)</label>
+                        <select id="eventSubject">
+                            <option value="">Ninguna</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventPriority">Prioridad</label>
+                        <select id="eventPriority">
+                            <option value="baja">Baja</option>
+                            <option value="media">Media</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Guardar Evento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Añadir al final del body en WEB_ESTUDIO.html, antes del cierre </body> -->
+
+<!-- Modal para Pomodoro -->
+<div class="modal" id="pomodoroModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Técnica Pomodoro</h3>
+            <button class="close-btn" id="closePomodoroModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="pomodoro-container">
+                <div class="pomodoro-timer" id="pomodoroTimer">
+                    <span id="pomodoroMinutes">25</span>:<span id="pomodoroSeconds">00</span>
+                </div>
+                <div class="pomodoro-controls">
+                    <button class="btn" id="startPomodoroBtn">Comenzar</button>
+                    <button class="btn" id="pausePomodoroBtn">Pausar</button>
+                    <button class="btn" id="resetPomodoroBtn">Reiniciar</button>
+                </div>
+                <div class="pomodoro-settings">
+                    <div class="form-group">
+                        <label for="studyTime">Tiempo de estudio (minutos)</label>
+                        <input type="number" id="studyTime" min="1" max="60" value="25">
+                    </div>
+                    <div class="form-group">
+                        <label for="breakTime">Tiempo de descanso (minutos)</label>
+                        <input type="number" id="breakTime" min="1" max="30" value="5">
+                    </div>
+                    <div class="form-group">
+                        <label for="pomodoroSubject">Asignatura</label>
+                        <select id="pomodoroSubject">
+                            <option value="">Selecciona una asignatura</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pomodoro-status" id="pomodoroStatus">
+                    Estado: Listo para comenzar
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para calculadora de promedios -->
+<div class="modal" id="gradeCalculatorModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Calculadora de Promedios</h3>
+            <button class="close-btn" id="closeGradeCalculatorModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="calculator-container">
+                <div class="form-group">
+                    <label for="calculatorSubject">Asignatura</label>
+                    <select id="calculatorSubject">
+                        <option value="">Selecciona una asignatura</option>
+                    </select>
+                </div>
+                <div class="current-grade">
+                    <h4>Nota Actual: <span id="currentGradeDisplay">-</span></h4>
+                </div>
+                <div class="grade-inputs">
+                    <h4>Añadir Evaluaciones</h4>
+                    <div class="grade-input-row">
+                        <input type="text" id="gradeName" placeholder="Nombre evaluación">
+                        <input type="number" id="gradeValue" min="0" max="10" step="0.1" placeholder="Nota">
+                        <input type="number" id="gradeWeight" min="1" max="100" placeholder="Peso (%)">
+                        <button class="btn btn-small" id="addGradeBtn">Añadir</button>
+                    </div>
+                </div>
+                <div class="grades-list" id="gradesList">
+                    <!-- Las evaluaciones se cargarán aquí -->
+                </div>
+                <div class="grade-results">
+                    <h4>Resultados</h4>
+                    <div class="result-item">
+                        <span>Promedio Actual:</span>
+                        <span id="currentAverage">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Peso Restante:</span>
+                        <span id="remainingWeight">100%</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Nota necesaria para aprobar:</span>
+                        <span id="neededGrade">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
