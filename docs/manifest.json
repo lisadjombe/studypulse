@@ -1,0 +1,18 @@
+{
+  "name": "StudyPulse - Organizador Universitario",
+  "short_name": "StudyPulse",
+  "description": "Organizador de asignaturas, calendario y tareas para estudiantes.",
+  "start_url": "/studypulse/?source=pwa",
+  "display": "standalone",
+  "scope": "/studypulse/",
+  "background_color": "#ffffff",
+  "theme_color": "#3498db",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icons/icon-64.png",  "sizes": "64x64",   "type": "image/png" },
+    { "src": "icons/icon-128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-256.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
