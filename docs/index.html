@@ -8,6 +8,99 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Nuevas Secciones Mejoradas -->
+<section class="dashboard-section">
+    <div class="container">
+        <div class="dashboard-grid">
+            <!-- Reloj en Tiempo Real -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock"></i> Hora Actual</h3>
+                </div>
+                <div class="card-body">
+                    <div id="liveClock" class="live-clock">
+                        <div class="time" id="currentTime">00:00:00</div>
+                        <div class="date" id="currentDate">1 de enero de 2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enlace Universidad -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-university"></i> Universidad</h3>
+                    <button class="edit-btn" onclick="editUniversityLink()">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="universityLinkContainer">
+                        <a href="https://www.ucavila.es" id="universityLink" target="_blank" class="university-link">
+                            <i class="fas fa-external-link-alt"></i>
+                            Universidad Católica de Ávila (UCAV)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bloc de Notas Rápido -->
+            <div class="dashboard-card notes-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-sticky-note"></i> Notas Rápidas</h3>
+                    <button class="edit-btn" onclick="clearAllNotes()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="notes-container">
+                        <textarea 
+                            id="quickNotes" 
+                            placeholder="Escribe tus notas rápidas aquí..."
+                            class="notes-textarea"
+                            rows="4"
+                        ></textarea>
+                        <div class="notes-actions">
+                            <button onclick="saveQuickNote()" class="notes-btn">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
+                            <button onclick="addTimestamp()" class="notes-btn secondary">
+                                <i class="fas fa-plus"></i> Fecha
+                            </button>
+                        </div>
+                        <div id="savedNotes" class="saved-notes">
+                            <!-- Notas guardadas aparecerán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal para editar enlace universidad -->
+<div class="modal" id="universityModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Enlace Universidad</h3>
+            <button class="close-btn" id="closeUniversityModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="customUniversityName">Nombre de la Universidad:</label>
+                <input type="text" id="customUniversityName" class="form-input" 
+                       placeholder="Ej: Universidad Católica de Ávila">
+            </div>
+            <div class="form-group">
+                <label for="customUniversityUrl">URL de la Universidad:</label>
+                <input type="url" id="customUniversityUrl" class="form-input" 
+                       placeholder="https://www.ucavila.es">
+            </div>
+            <button onclick="saveUniversityLink()" class="btn">
+                <i class="fas fa-save"></i> Guardar Enlace
+            </button>
+        </div>
+    </div>
+</div>
     <!-- Pantalla de bienvenida -->
     <div class="welcome-screen" id="welcomeScreen">
         <div class="logo">

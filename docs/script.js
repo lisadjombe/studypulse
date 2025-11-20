@@ -777,3 +777,376 @@ window.studyPulse = {
     editEvent,
     deleteEvent
 };
+
+
+// =============================================
+// NUEVAS FUNCIONALIDADES MEJORADAS
+// =============================================
+
+// Variables para nuevas funcionalidades
+let universityLink = "https://www.ucavila.es";
+let universityDisplayName = "Universidad Católica de Ávila (UCAV)";
+let quickNotes = [];
+
+// Inicializar nuevas funcionalidades cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    initializeNewFeatures();
+});
+
+function initializeNewFeatures() {
+    // Cargar datos guardados
+    loadNewFeaturesData();
+    
+    // Iniciar reloj en tiempo real
+    startLiveClock();
+    
+    // Renderizar notas guardadas
+    renderSavedNotes();
+    
+    // Configurar event listeners para nuevas funcionalidades
+    setupNewFeaturesEventListeners();
+    
+    console.log('🕒 Funcionalidades mejoradas inicializadas');
+}
+
+// Configurar event listeners para nuevas funcionalidades
+function setupNewFeaturesEventListeners() {
+    // Modal universidad
+    const closeUniversityModal = document.getElementById('closeUniversityModal');
+    if (closeUniversityModal) {
+        closeUniversityModal.addEventListener('click', function() {
+            document.getElementById('universityModal').classList.remove('active');
+        });
+    }
+    
+    // Cerrar modal al hacer clic fuera
+    document.addEventListener('click', function(e) {
+        if (e.target === document.getElementById('universityModal')) {
+            document.getElementById('universityModal').classList.remove('active');
+        }
+    });
+    
+    // Auto-guardar notas cada 30 segundos
+    setInterval(autoSaveQuickNote, 30000);
+    
+    // Guardar nota cuando se pierde el foco del textarea
+    const quickNotesTextarea = document.getElementById('quickNotes');
+    if (quickNotesTextarea) {
+        quickNotesTextarea.addEventListener('blur', saveQuickNote);
+    }
+}
+
+// Reloj en tiempo real
+function startLiveClock() {
+    function updateClock() {
+        const now = new Date();
+        const timeElement = document.getElementById('currentTime');
+        const dateElement = document.getElementById('currentDate');
+        
+        if (timeElement && dateElement) {
+            // Formatear hora
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+            
+            // Formatear fecha
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            dateElement.textContent = now.toLocaleDateString('es-ES', options);
+        }
+    }
+    
+    // Actualizar inmediatamente y luego cada segundo
+    updateClock();
+    setInterval(updateClock, 1000);
+}
+
+// Gestión del enlace de universidad
+function editUniversityLink() {
+    document.getElementById('customUniversityName').value = universityDisplayName;
+    document.getElementById('customUniversityUrl').value = universityLink;
+    document.getElementById('universityModal').classList.add('active');
+}
+
+function saveUniversityLink() {
+    const newName = document.getElementById('customUniversityName').value.trim();
+    const newUrl = document.getElementById('customUniversityUrl').value.trim();
+    
+    if (newName && newUrl) {
+        universityDisplayName = newName;
+        universityLink = newUrl;
+        
+        // Actualizar el enlace en la interfaz
+        const linkElement = document.getElementById('universityLink');
+        if (linkElement) {
+            linkElement.href = universityLink;
+            linkElement.innerHTML = `<i class="fas fa-external-link-alt"></i> ${universityDisplayName}`;
+        }
+        
+        // Guardar en localStorage
+        saveNewFeaturesData();
+        
+        // Cerrar modal
+        document.getElementById('universityModal').classList.remove('active');
+        
+        showNotification('✅ Enlace de universidad actualizado correctamente');
+    } else {
+        alert('Por favor, completa ambos campos');
+    }
+}
+
+// Gestión del bloc de notas
+function saveQuickNote() {
+    const notesTextarea = document.getElementById('quickNotes');
+    if (!notesTextarea) return;
+    
+    const content = notesTextarea.value.trim();
+    if (content) {
+        const newNote = {
+            id: Date.now().toString(),
+            content: content,
+            timestamp: new Date().toISOString(),
+            lastModified: new Date().toISOString()
+        };
+        
+        // Si hay notas existentes, actualizar la última
+        if (quickNotes.length > 0) {
+            quickNotes[0] = newNote;
+        } else {
+            quickNotes.unshift(newNote);
+        }
+        
+        saveNewFeaturesData();
+        renderSavedNotes();
+        showNotification('💾 Nota guardada automáticamente');
+    }
+}
+
+function autoSaveQuickNote() {
+    const notesTextarea = document.getElementById('quickNotes');
+    if (notesTextarea && notesTextarea.value.trim()) {
+        saveQuickNote();
+    }
+}
+
+function addTimestamp() {
+    const notesTextarea = document.getElementById('quickNotes');
+    if (!notesTextarea) return;
+    
+    const now = new Date();
+    const timestamp = `\n\n[${now.toLocaleString('es-ES')}] `;
+    
+    // Insertar timestamp en la posición actual del cursor
+    const start = notesTextarea.selectionStart;
+    const end = notesTextarea.selectionEnd;
+    const text = notesTextarea.value;
+    
+    notesTextarea.value = text.substring(0, start) + timestamp + text.substring(end);
+    notesTextarea.focus();
+    notesTextarea.setSelectionRange(start + timestamp.length, start + timestamp.length);
+    
+    // Guardar automáticamente
+    saveQuickNote();
+}
+
+function renderSavedNotes() {
+    const savedNotesContainer = document.getElementById('savedNotes');
+    if (!savedNotesContainer) return;
+    
+    if (quickNotes.length === 0) {
+        savedNotesContainer.innerHTML = `
+            <div style="text-align: center; color: rgba(255,255,255,0.7); padding: 1rem;">
+                <i class="fas fa-sticky-note" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                <p>No hay notas guardadas</p>
+                <small>Escribe algo arriba y se guardará automáticamente</small>
+            </div>
+        `;
+        return;
+    }
+    
+    savedNotesContainer.innerHTML = quickNotes.map(note => `
+        <div class="note-item">
+            <div class="note-content">${formatNoteContent(note.content)}</div>
+            <div class="note-timestamp">
+                <span>${formatDate(note.timestamp)}</span>
+                <button class="delete-note" onclick="deleteNote('${note.id}')" title="Eliminar nota">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function formatNoteContent(content) {
+    // Convertir saltos de línea en <br> para mostrar correctamente
+    return content.replace(/\n/g, '<br>');
+}
+
+function deleteNote(noteId) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta nota?')) {
+        quickNotes = quickNotes.filter(note => note.id !== noteId);
+        saveNewFeaturesData();
+        renderSavedNotes();
+        showNotification('🗑️ Nota eliminada');
+    }
+}
+
+function clearAllNotes() {
+    if (confirm('¿Estás seguro de que quieres eliminar TODAS las notas? Esta acción no se puede deshacer.')) {
+        quickNotes = [];
+        const notesTextarea = document.getElementById('quickNotes');
+        if (notesTextarea) {
+            notesTextarea.value = '';
+        }
+        saveNewFeaturesData();
+        renderSavedNotes();
+        showNotification('🗑️ Todas las notas han sido eliminadas');
+    }
+}
+
+// Persistencia de datos para nuevas funcionalidades
+function saveNewFeaturesData() {
+    const data = {
+        universityLink: universityLink,
+        universityDisplayName: universityDisplayName,
+        quickNotes: quickNotes
+    };
+    
+    localStorage.setItem('studyPulseEnhancedData', JSON.stringify(data));
+}
+
+function loadNewFeaturesData() {
+    const savedData = localStorage.getItem('studyPulseEnhancedData');
+    
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            universityLink = data.universityLink || "https://www.ucavila.es";
+            universityDisplayName = data.universityDisplayName || "Universidad Católica de Ávila (UCAV)";
+            quickNotes = data.quickNotes || [];
+            
+            // Actualizar la interfaz con los datos cargados
+            updateUniversityLinkDisplay();
+            loadQuickNotesContent();
+        } catch (error) {
+            console.error('Error cargando datos mejorados:', error);
+        }
+    }
+}
+
+function updateUniversityLinkDisplay() {
+    const linkElement = document.getElementById('universityLink');
+    if (linkElement) {
+        linkElement.href = universityLink;
+        linkElement.innerHTML = `<i class="fas fa-external-link-alt"></i> ${universityDisplayName}`;
+    }
+}
+
+function loadQuickNotesContent() {
+    const notesTextarea = document.getElementById('quickNotes');
+    if (notesTextarea && quickNotes.length > 0) {
+        // Cargar la nota más reciente en el textarea
+        notesTextarea.value = quickNotes[0].content;
+    }
+}
+
+// Sistema de notificaciones mejorado
+function showNotification(message, type = 'info') {
+    // Crear elemento de notificación
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span>${message}</span>
+        </div>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Estilos básicos para la notificación
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-left: 4px solid #3498db;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease;
+    `;
+    
+    // Colores según el tipo
+    const colors = {
+        info: '#3498db',
+        success: '#2ecc71',
+        warning: '#f39c12',
+        error: '#e74c3c'
+    };
+    
+    notification.style.borderLeftColor = colors[type] || colors.info;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remover después de 4 segundos
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 4000);
+}
+
+// Añadir estilos CSS para las animaciones si no existen
+if (!document.querySelector('#enhanced-styles')) {
+    const style = document.createElement('style');
+    style.id = 'enhanced-styles';
+    style.textContent = `
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-close:hover {
+            background: #f5f5f5;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Exportar funciones al objeto global para debugging
+window.studyPulseEnhanced = {
+    editUniversityLink,
+    saveUniversityLink,
+    saveQuickNote,
+    clearAllNotes,
+    getData: () => ({ universityLink, universityDisplayName, quickNotes })
+};
+
+console.log('🚀 StudyPulse Enhanced Features Loaded');
